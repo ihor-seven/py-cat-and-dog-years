@@ -1,24 +1,37 @@
+import pytest
 from app.main import get_human_age
 
 
-def test_should_return_zero_for_zero_ages() -> None:
-    assert get_human_age(0, 0) == [0, 0]
-    assert get_human_age(14, 14) == [0, 0]
+@pytest.mark.parametrize(
+    "cat_age, dog_age, expected",
+    [
+        (0, 0, [0, 0]),
+        (14, 14, [0, 0]),
+        (15, 15, [1, 1]),
+        (23, 23, [1, 1]),
+        (24, 24, [2, 2]),
+        (27, 27, [2, 2]),
+        (28, 28, [3, 2]),
+        (100, 100, [21, 17]),
+    ],
+)
+def test_get_human_age_valid_cases(
+        cat_age: int,
+        dog_age: int,
+        expected: list[int]
+) -> None:
+    assert get_human_age(cat_age, dog_age) == expected
 
 
-def test_should_return_one_for_first_threshold() -> None:
-    assert get_human_age(15, 15) == [1, 1]
-    assert get_human_age(23, 23) == [1, 1]
+def test_get_human_age_should_raise_for_negative_values() -> None:
+    with pytest.raises(ValueError):
+        get_human_age(-1, 10)
+    with pytest.raises(ValueError):
+        get_human_age(10, -5)
 
 
-def test_should_increase_after_second_threshold() -> None:
-    assert get_human_age(24, 24) == [2, 2]
-    assert get_human_age(27, 27) == [2, 2]
-
-
-def test_should_increase_after_third_threshold() -> None:
-    assert get_human_age(28, 28) == [3, 2]
-
-
-def test_large_values_should_be_calculated_correctly() -> None:
-    assert get_human_age(100, 100) == [21, 17]
+def test_get_human_age_should_raise_for_invalid_types() -> None:
+    with pytest.raises(TypeError):
+        get_human_age("cat", 10)  # type: ignore
+    with pytest.raises(TypeError):
+        get_human_age(15, "dog")  # type: ignore
